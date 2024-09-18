@@ -5,7 +5,7 @@ import { debounce } from 'lodash-es';
 import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { DefaultOptionType } from 'rc-select/es/Select';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Selector } from '@/components/ui/index';
 
@@ -42,20 +42,32 @@ export default function DashboardFilter({
         }
     }, [defaultSearchBy, filterChange]);
 
+    const handleDebouncedSearch = useMemo(() => {
+        return debounce((value) => {
+            if (filterChange) {
+                filterChange({
+                    search: value,
+                    by: searchByValue || defaultSearchBy,
+                });
+            }
+        }, 1000);
+    }, [defaultSearchBy, filterChange, searchByValue]);
+
+    const onSearch = useCallback(
+        (e: any) => {
+            const value = e.target.value;
+            setSearchValue(value);
+            handleDebouncedSearch(value);
+        },
+        [handleDebouncedSearch],
+    );
+
     return (
         <div className="flex items-center gap-3">
             <Input
                 className="flex-1"
-                defaultValue={searchValue}
-                onChange={debounce(({ target: { value } }) => {
-                    setSearchValue(value);
-                    if (filterChange) {
-                        filterChange({
-                            search: value,
-                            by: searchByValue || defaultSearchBy,
-                        });
-                    }
-                }, 1000)}
+                value={searchValue}
+                onChange={onSearch}
                 placeholder={searchPlaceholder}
                 prefix={<Search size={16} className="mr-1" />}
             />

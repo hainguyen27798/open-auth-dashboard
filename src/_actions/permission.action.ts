@@ -1,18 +1,18 @@
 'use server';
 
-import type { CreatePermissionDto, InputSearchDto, Permission, UpdatePermissionDto } from '@/types';
+import type { CreatePermissionDto, InputSearchDto, Pagination, Permission, UpdatePermissionDto } from '@/types';
 import { HttpClient, withToken } from '@/utils';
 
-export async function getPermissions({ search = '', by = '' }: InputSearchDto) {
-    const rs = await withToken<Permission[]>(HttpClient.get)({
-        uri: `/role-permissions?search=${search}&by=${by}`,
+export async function getPermissions({ search = '', by = '', page, pageSize }: InputSearchDto) {
+    const rs = await withToken<Pagination<Permission>>(HttpClient.get)({
+        uri: `/permissions?search=${search}&by=${by}&take=${pageSize}&page=${page}`,
     });
     return rs.data;
 }
 
 export async function createPermission(form: CreatePermissionDto) {
     const rs = await withToken<Permission[]>(HttpClient.post)({
-        uri: '/role-permissions',
+        uri: '/permissions',
         body: form,
     });
 
@@ -24,7 +24,7 @@ export async function createPermission(form: CreatePermissionDto) {
 
 export async function updatePermission(id: string, form: UpdatePermissionDto) {
     const rs = await withToken<Permission[]>(HttpClient.patch)({
-        uri: `/role-permissions/${id}`,
+        uri: `/permissions/${id}`,
         body: form,
     });
 
@@ -36,7 +36,7 @@ export async function updatePermission(id: string, form: UpdatePermissionDto) {
 
 export async function deletePermission(id: string) {
     const rs = await withToken<Permission[]>(HttpClient.delete)({
-        uri: `/role-permissions/${id}`,
+        uri: `/permissions/${id}`,
     });
 
     return {

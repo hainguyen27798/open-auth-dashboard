@@ -10,6 +10,8 @@ export const permissionSlice = createSlice({
             reload: 0,
             search: '',
             by: '',
+            page: 1,
+            pageSize: 5,
         },
     },
     reducers: {

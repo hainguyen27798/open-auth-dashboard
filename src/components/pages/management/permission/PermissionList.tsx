@@ -1,6 +1,6 @@
 'use client';
 
-import { App, Button, Dropdown, type MenuProps, Table } from 'antd';
+import { App, Button, Dropdown, type MenuProps, Pagination, Table } from 'antd';
 import { Ellipsis, PencilLine, Trash } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -88,7 +88,7 @@ export default function PermissionList() {
 
     return (
         <>
-            <Table dataSource={data} rowKey="id" loading={isLoading}>
+            <Table dataSource={data?.data} rowKey="id" loading={isLoading} pagination={false}>
                 <Table.Column<Permission> key="serviceName" title={$t('serviceName')} dataIndex="serviceName" />
                 <Table.Column<Permission> key="resource" title={$t('resource')} dataIndex="resource" />
                 <Table.Column<Permission> key="action" title={$t('action')} dataIndex="action" />
@@ -97,12 +97,22 @@ export default function PermissionList() {
                     key="action_btn"
                     dataIndex="id"
                     render={(id, record) => (
-                        <div className="flex items-center justify-end gap-2">
-                            {record.canModify && renderActionButton(id, record)}
-                        </div>
+                        <div className="flex items-center justify-end gap-2">{renderActionButton(id, record)}</div>
                     )}
                 ></Table.Column>
             </Table>
+            <div className="mt-4 flex justify-end">
+                {!isLoading && !!data?.metaData?.total && (
+                    <Pagination
+                        total={data?.metaData?.total}
+                        pageSize={data?.metaData?.pageSize}
+                        current={data?.metaData?.pageSelected}
+                        onChange={(page) => {
+                            dispatch(changeSearchPermissionAction({ reload: Date.now(), page }));
+                        }}
+                    />
+                )}
+            </div>
             <PermissionEditor isOpen={!!permission} permission={permission} close={() => setPermission(undefined)} />
         </>
     );

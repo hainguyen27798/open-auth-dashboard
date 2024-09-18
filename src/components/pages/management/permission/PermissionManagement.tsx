@@ -50,7 +50,14 @@ export default function PermissionManagement() {
                     searchByOptions={searchByOptions}
                     defaultSearchBy="resource"
                     searchPlaceholder={$t('search_for')}
-                    filterChange={(value) => dispatch(changeSearchPermissionAction(value))}
+                    filterChange={(value) =>
+                        dispatch(
+                            changeSearchPermissionAction({
+                                ...value,
+                                reload: Date.now(),
+                            }),
+                        )
+                    }
                 />
                 <div className="mt-6">
                     <PermissionList />
