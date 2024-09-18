@@ -97,14 +97,12 @@ export default function PermissionList() {
                     key="action_btn"
                     dataIndex="id"
                     render={(id, record) => (
-                        <div className="flex items-center justify-end gap-2">
-                            {record.canModify && renderActionButton(id, record)}
-                        </div>
+                        <div className="flex items-center justify-end gap-2">{renderActionButton(id, record)}</div>
                     )}
                 ></Table.Column>
             </Table>
             <div className="mt-4 flex justify-end">
-                {!isLoading && (
+                {!isLoading && !!data?.metaData?.total && (
                     <Pagination
                         total={data?.metaData?.total}
                         pageSize={data?.metaData?.pageSize}
