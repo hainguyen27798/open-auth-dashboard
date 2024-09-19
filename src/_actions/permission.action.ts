@@ -10,9 +10,9 @@ export async function getPermissions({ search = '', by = '', page, pageSize }: I
     return rs.data;
 }
 
-export async function getAllPermissions() {
+export async function getPermissionOptions({ roleId }: { roleId: string }) {
     const rs = await withToken<Permission[]>(HttpClient.get)({
-        uri: `/permissions/all`,
+        uri: `/permissions/options/${roleId}`,
     });
     return rs.data;
 }
