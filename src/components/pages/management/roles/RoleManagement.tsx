@@ -17,10 +17,6 @@ const searchByOptions: DefaultOptionType[] = [
         label: 'Name',
         value: 'name',
     },
-    {
-        label: 'Description',
-        value: 'description',
-    },
 ];
 
 export default function RoleManagement() {

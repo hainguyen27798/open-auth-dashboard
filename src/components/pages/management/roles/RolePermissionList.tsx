@@ -3,16 +3,22 @@
 import { App, Button, Dropdown, type MenuProps, Table } from 'antd';
 import { Ellipsis, Trash } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import useSWRImmutable from 'swr/immutable';
 
-import { deleteRolePermission, getRole } from '@/_actions/role.action';
+import { deleteRolePermission, getRolePermissions } from '@/_actions/role.action';
 import { useAppDispatch, useAppSelector } from '@/lib/store/hook';
-import { changeCurrentRoleAction, selectCurrentRoleState } from '@/lib/store/slices';
+import { reloadRolePermission, selectReloadRolePermission } from '@/lib/store/slices';
 import { useRouter } from '@/navigation';
 import type { Permission } from '@/types';
 
-export default function RolePermissionList() {
+type RolePermissionListProps = {
+    id: string;
+};
+
+export default function RolePermissionList({ id }: RolePermissionListProps) {
     const $t = useTranslations('roles.details.permissions.table');
-    const role = useAppSelector(selectCurrentRoleState);
+    const reload = useAppSelector(selectReloadRolePermission);
+    const { data, isLoading } = useSWRImmutable({ id, reload }, getRolePermissions);
     const dispatch = useAppDispatch();
     const { notification, modal } = App.useApp();
     const router = useRouter();
@@ -39,24 +45,19 @@ export default function RolePermissionList() {
             okType: 'danger',
             okText: $t('delete_btn'),
             onOk: async () => {
-                if (role.data?.id) {
-                    dispatch(changeCurrentRoleAction({ isLoading: true }));
-                    const rs = await deleteRolePermission(role.data.id, permissionId);
+                const rs = await deleteRolePermission(id, permissionId);
 
-                    if (rs?.error) {
-                        notification.error({
-                            message: rs.message,
-                            showProgress: true,
-                        });
-                    } else {
-                        notification.success({
-                            message: rs.message,
-                            showProgress: true,
-                        });
-                        const data = await getRole(role.data.id);
-                        dispatch(changeCurrentRoleAction({ data }));
-                    }
-                    dispatch(changeCurrentRoleAction({ isLoading: false }));
+                if (rs?.error) {
+                    notification.error({
+                        message: rs.message,
+                        showProgress: true,
+                    });
+                } else {
+                    notification.success({
+                        message: rs.message,
+                        showProgress: true,
+                    });
+                    dispatch(reloadRolePermission());
                 }
             },
         });
@@ -92,7 +93,7 @@ export default function RolePermissionList() {
     };
 
     return (
-        <Table dataSource={role.data?.permissions} rowKey="id" loading={role.isLoading}>
+        <Table dataSource={data} rowKey="id" loading={isLoading}>
             <Table.Column<Permission> key="serviceName" title={$t('serviceName')} dataIndex="serviceName" />
             <Table.Column<Permission> key="resource" title={$t('resource')} dataIndex="resource" />
             <Table.Column<Permission> key="action" title={$t('action')} dataIndex="action" />
@@ -101,11 +102,7 @@ export default function RolePermissionList() {
             <Table.Column<Permission>
                 key="action_btn"
                 dataIndex="id"
-                render={(id) => (
-                    <div className="flex items-center justify-end gap-2">
-                        {role.data?.canModify && renderActionButton(id)}
-                    </div>
-                )}
+                render={(id) => <div className="flex items-center justify-end gap-2">{renderActionButton(id)}</div>}
             ></Table.Column>
         </Table>
     );

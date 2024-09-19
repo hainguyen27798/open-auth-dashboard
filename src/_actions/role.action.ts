@@ -1,11 +1,11 @@
 'use server';
 
-import type { CreateRoleDto, InputSearchDto, Role, UpdateRoleDto } from '@/types';
+import type { CreateRoleDto, InputSearchDto, Pagination, Permission, Role, UpdateRoleDto } from '@/types';
 import { HttpClient, withToken } from '@/utils';
 
-export async function getRoles({ search = '', by = '' }: InputSearchDto) {
-    const rs = await withToken<Role[]>(HttpClient.get)({
-        uri: `/roles?search=${search}&by=${by}`,
+export async function getRoles({ search = '', by = '', pageSize = 5, page = 0 }: InputSearchDto) {
+    const rs = await withToken<Pagination<Role>>(HttpClient.get)({
+        uri: `/roles?search=${search}&by=${by}&take=${pageSize}&page=${page}`,
     });
     return rs.data;
 }
@@ -13,6 +13,13 @@ export async function getRoles({ search = '', by = '' }: InputSearchDto) {
 export async function getRole(id: string) {
     const rs = await withToken<Role>(HttpClient.get)({
         uri: `/roles/${id}`,
+    });
+    return rs.data;
+}
+
+export async function getRolePermissions({ id }: { id: string }) {
+    const rs = await withToken<Permission[]>(HttpClient.get)({
+        uri: `/roles/${id}/permissions`,
     });
     return rs.data;
 }
