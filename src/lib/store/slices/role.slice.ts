@@ -9,6 +9,7 @@ type TRoleState = {
         isLoading: true;
         data: Role | null;
     };
+    reloadRolePermissions: number;
 };
 
 const initialState: TRoleState = {
@@ -24,6 +25,7 @@ const initialState: TRoleState = {
         isLoading: true,
         data: null,
     },
+    reloadRolePermissions: 0,
 };
 
 export const roleSlice = createSlice({
@@ -48,11 +50,19 @@ export const roleSlice = createSlice({
                 },
             };
         },
+        reloadRolePermission: (state) => {
+            return {
+                ...state,
+                reloadRolePermissions: Date.now(),
+            };
+        },
     },
 });
 
-export const { changeSearchRoleAction, changeCurrentRoleAction } = roleSlice.actions;
+export const { changeSearchRoleAction, changeCurrentRoleAction, reloadRolePermission } = roleSlice.actions;
 
 export const selectSearchRoleState = (state: RootState) => state.role.searchRoleState;
 
 export const selectCurrentRoleState = (state: RootState) => state.role.currentRole;
+
+export const selectReloadRolePermission = (state: RootState) => state.role.reloadRolePermissions;

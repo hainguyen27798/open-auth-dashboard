@@ -5,9 +5,9 @@ import { Ellipsis, Trash } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import useSWRImmutable from 'swr/immutable';
 
-import { deleteRolePermission, getRole, getRolePermissions } from '@/_actions/role.action';
-import { useAppDispatch } from '@/lib/store/hook';
-import { changeCurrentRoleAction } from '@/lib/store/slices';
+import { deleteRolePermission, getRolePermissions } from '@/_actions/role.action';
+import { useAppDispatch, useAppSelector } from '@/lib/store/hook';
+import { reloadRolePermission, selectReloadRolePermission } from '@/lib/store/slices';
 import { useRouter } from '@/navigation';
 import type { Permission } from '@/types';
 
@@ -17,7 +17,8 @@ type RolePermissionListProps = {
 
 export default function RolePermissionList({ id }: RolePermissionListProps) {
     const $t = useTranslations('roles.details.permissions.table');
-    const { data, isLoading } = useSWRImmutable({ id }, getRolePermissions);
+    const reload = useAppSelector(selectReloadRolePermission);
+    const { data, isLoading } = useSWRImmutable({ id, reload }, getRolePermissions);
     const dispatch = useAppDispatch();
     const { notification, modal } = App.useApp();
     const router = useRouter();
@@ -44,7 +45,6 @@ export default function RolePermissionList({ id }: RolePermissionListProps) {
             okType: 'danger',
             okText: $t('delete_btn'),
             onOk: async () => {
-                dispatch(changeCurrentRoleAction({ isLoading: true }));
                 const rs = await deleteRolePermission(id, permissionId);
 
                 if (rs?.error) {
@@ -57,10 +57,8 @@ export default function RolePermissionList({ id }: RolePermissionListProps) {
                         message: rs.message,
                         showProgress: true,
                     });
-                    const data = await getRole(id);
-                    dispatch(changeCurrentRoleAction({ data }));
+                    dispatch(reloadRolePermission());
                 }
-                dispatch(changeCurrentRoleAction({ isLoading: false }));
             },
         });
     };

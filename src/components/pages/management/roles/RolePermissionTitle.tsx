@@ -4,10 +4,9 @@ import { Button } from 'antd';
 import { useTranslations } from 'next-intl';
 import { useCallback, useState } from 'react';
 
-import { getRole } from '@/_actions/role.action';
 import AddRolePermissionModel from '@/components/pages/management/roles/AddRolePermissionModel';
 import { useAppDispatch, useAppSelector } from '@/lib/store/hook';
-import { changeCurrentRoleAction, selectCurrentRoleState } from '@/lib/store/slices';
+import { reloadRolePermission, selectCurrentRoleState } from '@/lib/store/slices';
 
 export default function RolePermissionTitle() {
     const $t = useTranslations('roles.details.permissions');
@@ -18,18 +17,11 @@ export default function RolePermissionTitle() {
     const onClose = useCallback(
         (ok: boolean) => {
             setIsOpen(false);
-            if (ok && role.data?.id) {
-                dispatch(changeCurrentRoleAction({ isLoading: true }));
-                getRole(role.data.id)
-                    .then((data) => {
-                        dispatch(changeCurrentRoleAction({ data }));
-                    })
-                    .finally(() => {
-                        dispatch(changeCurrentRoleAction({ isLoading: false }));
-                    });
+            if (ok) {
+                dispatch(reloadRolePermission());
             }
         },
-        [dispatch, role.data?.id],
+        [dispatch],
     );
 
     return (
