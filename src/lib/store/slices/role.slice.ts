@@ -17,6 +17,8 @@ const initialState: TRoleState = {
         reload: 0,
         search: '',
         by: '',
+        page: 1,
+        pageSize: 5,
     },
     currentRole: {
         isLoading: true,

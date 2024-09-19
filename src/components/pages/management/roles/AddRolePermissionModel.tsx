@@ -6,7 +6,7 @@ import type { DefaultOptionType } from 'rc-select/es/Select';
 import { useCallback, useMemo, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
-import { getPermissions } from '@/_actions/permission.action';
+import { getAllPermissions } from '@/_actions/permission.action';
 import { addPermissionForRole } from '@/_actions/role.action';
 import { LoadingWrapper, Selector } from '@/components/ui';
 import type { Role } from '@/types';
@@ -25,7 +25,7 @@ export default function AddRolePermissionModel({ isOpen, close, role }: AddRoleP
     const $t = useTranslations('roles.details.add_role_permission_model');
     const [isModalOpen, setIsModalOpen] = useState<boolean | undefined>(false);
     const [form] = Form.useForm<TForm>();
-    const { data, isLoading } = useSWRImmutable({}, getPermissions);
+    const { data, isLoading } = useSWRImmutable({ flag: 'getAllPermissions' }, getAllPermissions);
     const { notification } = App.useApp();
 
     const onClose = useCallback(

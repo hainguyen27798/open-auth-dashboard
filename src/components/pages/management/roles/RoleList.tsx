@@ -1,7 +1,7 @@
 'use client';
 
 import type { MenuProps } from 'antd';
-import { App, Button, Dropdown, Table } from 'antd';
+import { App, Button, Dropdown, Pagination, Table } from 'antd';
 import { Ellipsis, Trash } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import useSWRImmutable from 'swr/immutable';
@@ -91,7 +91,7 @@ export default function RoleList() {
 
     return (
         <>
-            <Table dataSource={data} rowKey="id" loading={isLoading}>
+            <Table dataSource={data?.data} rowKey="id" loading={isLoading} pagination={false}>
                 <Table.Column<Role>
                     key="name"
                     title={$t('name')}
@@ -116,6 +116,18 @@ export default function RoleList() {
                     )}
                 ></Table.Column>
             </Table>
+            <div className="mt-4 flex justify-end">
+                {!isLoading && !!data?.metaData?.total && (
+                    <Pagination
+                        total={data?.metaData?.total}
+                        pageSize={data?.metaData?.pageSize}
+                        current={data?.metaData?.pageSelected}
+                        onChange={(page) => {
+                            dispatch(changeSearchRoleAction({ reload: Date.now(), page }));
+                        }}
+                    />
+                )}
+            </div>
         </>
     );
 }
